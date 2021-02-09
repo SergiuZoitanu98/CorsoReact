@@ -15,11 +15,10 @@ class Counters extends Component {
 
   render() {
     return (
-      <div className="row">
+      <div>
         {this.state.counters.map((counter) => (
           <Counter
             key={counter.id}
-            className="col-12"
             onDelete={this.handleDelete} //counters is the parent of counter, so it handles the event raised, now the event is the delete function
             //so if you go back in the counter component, you'll se that on the delete button we are calling the props object on it, accessing the atrributes set on the parent component
             //wich are onDelete,value and key, but now we are calling only the onDelete event.
