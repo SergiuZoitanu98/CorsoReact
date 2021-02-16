@@ -1,22 +1,37 @@
 import React, { Component } from "react";
 //import getMovies method from our service
 import { getMovies } from "../services/fakeMovieService";
-import Like from "./common/like";
+import { getGenres } from "../services/fakeGenreService";
+
 import Pagination from "./common/pagination";
+import { paginate } from "../utils/paginate";
+import ListGroup from "./common/listGroup";
+import MoviesTable from "./moviesTable";
+import _ from "lodash";
+
 class Movies extends Component {
-  //initialize the state of the component by calling the method you've imported
   state = {
-    movies: getMovies(),
+    movies: [],
     pageSize: 4,
+    currentPage: 1,
+    genres: [],
+    sortColumn: { PATH: "title", order: "asc" },
   };
-  //create an event onclick to delete a movie
+
+  componentDidMount() {
+    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
+    this.setState({ movies: getMovies(), genres });
+  }
+
   handleDelete = (movie) => {
-    //we will get all the movies except the one we are passing to the method
-    //when we click "delete", the state will change with the method setState,
-    //p.s if we have duplicates variables like below "movies:movies" we can write only "movies", its the same thing
     const movies = this.state.movies.filter((m) => m._id !== movie._id);
     this.setState({ movies });
   };
+
+  handleSort = (sortColumn) => {
+    this.setState({ sortColumn });
+  };
+
   handleLike = (movie) => {
     const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
@@ -26,63 +41,67 @@ class Movies extends Component {
   };
 
   handlePageChange = (page) => {
-    console.log(page);
+    this.setState({ currentPage: page });
+  };
+
+  handelGenreSelect = (genre) => {
+    this.setState({ selectedGenre: genre, currentPage: 1 });
+  };
+
+  getPageData = () => {
+    const {
+      pageSize,
+      currentPage,
+      selectedGenre,
+      movies: allMovies,
+      sortColumn,
+    } = this.state;
+
+    const filtered =
+      selectedGenre && selectedGenre._id
+        ? allMovies.filter((m) => m.genre._id === selectedGenre._id)
+        : allMovies;
+
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+
+    const movies = paginate(sorted, currentPage, pageSize);
+
+    return { totalCount: filtered.length, data: movies };
   };
 
   render() {
-    //we are descructuring the object, changing the name of "length" to "count" for make the code much readable
-    // so "count" will have the number of movies in our fake databaase
-    //down below we are saying "if the number of movies are equal to 0 , show message 'There are no movies in the databse' "
-    //otherwise show the number of movies in the databse
     const { length: count } = this.state.movies;
-    if (count === 0) return <p>There are no movies in the database</p>;
-    return (
-      <>
-        <p>Showing {count} movies in the database</p>
+    const { pageSize, currentPage, sortColumn } = this.state;
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Genre</th>
-              <th>Stock</th>
-              <th>Rate</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.movies.map((movie) => (
-              //whenever we are using the map method of the array, we must set the key wich is unique for all the elements of the array
-              <tr key={movie._id}>
-                <td>{movie.title}</td>
-                <td>{movie.genre.name}</td>
-                <td>{movie.numberInStock}</td>
-                <td>{movie.dailyRentalRate}</td>
-                <td>
-                  <Like
-                    liked={movie.liked}
-                    onClick={() => this.handleLike(movie)}
-                  />
-                </td>
-                <td>
-                  <button
-                    onClick={() => this.handleDelete(movie)}
-                    className="btn btn-danger btn-sm"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Pagination
-          itemsCount={count}
-          pageSize={this.state.pageSize}
-          onPageChange={this.handlePageChange}
-        />
-      </>
+    if (count === 0) return <p>There are no movies in the database</p>;
+
+    const { totalCount, data: movies } = this.getPageData();
+    return (
+      <div className="row">
+        <div className="col-3">
+          <ListGroup
+            items={this.state.genres}
+            onItemSelect={this.handelGenreSelect}
+            selectedItem={this.state.selectedGenre}
+          />
+        </div>
+        <div className="col">
+          <p>Showing {totalCount} movies in the database</p>
+          <MoviesTable
+            movies={movies}
+            sortColumn={sortColumn}
+            onLike={this.handleLike}
+            onDelete={this.handleDelete}
+            onSort={this.handleSort}
+          />
+          <Pagination
+            itemsCount={totalCount}
+            pageSize={pageSize}
+            onPageChange={this.handlePageChange}
+            currentPage={currentPage}
+          />
+        </div>
+      </div>
     );
   }
 }
