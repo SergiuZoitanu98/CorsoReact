@@ -4,4 +4,3 @@ const NotFound = () => {
 };
 
 export default NotFound;
-<h1>Not Found</h1>;
