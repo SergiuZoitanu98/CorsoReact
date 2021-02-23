@@ -1,0 +1,204 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+body, html {
+  height: 100%;
+  background-repeat: no-repeat;
+  font-family: Arial !important;
+}
+
+.backgroundLogin {
+  background-color: #b3ce27;
+}
+
+.container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  width: 80%;
+  height: 100vh;
+  justify-content: center;
+}
+
+.card-container {
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  width: 60%;
+  border: 1px #b3ce27 solid;
+  height: 70vh;
+}
+
+.containerOperation {
+  border: 1px #b3ce27 solid;
+  height: 30vh;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  flex-flow: row nowrap;
+  width: 50%;
+  margin: auto;
+  margin-top: 5% !important;
+}
+
+.login-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: column;
+  width: 27%;
+  height: 18vh;
+  margin-bottom: 4%;
+  border: 1px solid #b3ce27;
+}
+
+.form-signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: column;
+  width: 60%;
+  margin: 5px;
+  margin-bottom: 8%;
+}
+
+.button-container {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-login{
+  width: 30%;
+}
+
+.formUser {
+  margin: 10px;
+}
+
+.ricercaClienti {
+  margin: 16px;
+}
+
+.formRicercaClienti {
+  border: 1px black solid;
+  padding-top: 30px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 3px;
+}
+
+.commondFieldset{
+  border: 1px black solid;
+  padding: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  border-radius: 3px;
+}
+
+.commondFieldsetLabel{
+  margin-left: 20px;
+}
+
+.formRicercaClientiError {
+  border: 1px black solid;
+  padding-top: 30px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 3px;
+}
+
+.labelForm{
+  margin-top: 8px;
+}
+
+.bottoneRicerca {margin-top: 25px;}
+
+.verifyRegistry {
+  border: 1px black solid;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.underlined {
+  text-decoration: underline;
+}
+
+.checkBox {
+  margin-top: 5px;
+  margin-left: 4%;
+}
+
+.tableClienti {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  width: 98%;
+}
+
+.bottoneDettaglio {
+  border-bottom: 1px black solid;
+}
+
+.errorInput {
+  border: 1px red solid;
+}
+
+.navButton {
+  color: black;
+}
+
+.navButton:hover {
+  color: black;
+}
+
+.active {
+  text-decoration: underline black;
+}
+
+.noPadding {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+.reactselect-valid > .css-yk16xz-control {
+  border-color: #28a745;
+}
+
+.reactselect-invalid > .css-yk16xz-control {
+  border-color: #dc3545;
+}
+
+.span-error-filiale {
+  margin-left: 6%;
+}
+
+.span-error-nag {
+  margin-left: 2%;
+}

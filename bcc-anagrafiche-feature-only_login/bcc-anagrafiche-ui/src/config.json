@@ -1,0 +1,9 @@
+{
+    "apiLoginEndpoint": "[REACT_APP_URL_JAVA]/api/v1/login",
+    "apiFilialiEndpoint": "[REACT_APP_URL_JAVA]/api/v1/branch-search",
+    "apiClienteEndpoint": "[REACT_APP_URL_JAVA]/api/v1/customer-search",
+    "apiVerifyAnagraficaEndpoint": "[REACT_APP_URL_JAVA]/api/v1/customer-mark-as-edited",
+    "apiStatsTotali": "[REACT_APP_URL_JAVA]/api/v1/get-stats",
+    "apiDownloadEndpoint": "[REACT_APP_URL_JAVA]/api/v1/document"
+  }
+  
