@@ -7,12 +7,20 @@ axios.interceptors.response.use(null, error => {
   return Promise.reject(error)
 });
 
-const apiEndpoint = 'https://jsonplaceholder.typicode.com/posts';
+const apiEndpoint = 'http://localhost:8000/api/post';
 
 class App extends Component {
   
   state = {
-    posts: []
+    posts: [],
+    addFormVisible: false,
+    updatePostVisible: false,
+    newPostId: "",
+    newPostTitle: "",
+    newPostBody: "",
+    newPostAuthor: "",
+    updatedPostTitle: "",
+    updatedPostBody: ""
   };
 
   async componentDidMount() {
@@ -28,34 +36,65 @@ class App extends Component {
     //but the response object also got a property called data, so we can descructure the object, pick the data wich is the array of 100 posts and rename it to "posts"
     //then we call the setState method and we update the array of posts
     //and then we will get the data rendered in the page
-    const {data:posts} = await axios.get(apiEndpoint);
-    this.setState({posts})
-}
+    this.handleGetAll();
+  }
+  
+  toggleAddPostForm = async () => {
+    this.setState({ addFormVisible: !this.state.addFormVisible });
+  }
+
+  handleGetAll = async () => {
+    await axios.get(apiEndpoint).then((data) => {
+      this.setState({posts: data.data})
+    });
+  }
+
    handleAdd = async () => {
     //we need to send new data to the backend, the post object has 2 property, so we create the object with title and body
     //then we call the method of axios .post and we pass the endpoint and the object (post) we created
     //the server then will responde with the new created post
-    const obj = { title: 'a', body: 'b' };
-     const { data: post } = await axios.post(apiEndpoint, obj);
-     console.log(post);
-     //once you created the new post, you must show it in the table on the page
-     //create an empty array, pass the new post and then copy the data from the actual array of posts of the state
-     const posts = [post, ...this.state.posts];
-     this.setState({ posts });
+    const post = { 
+      postId: this.state.newPostId,
+      postTitle: this.state.newPostTitle,
+      postBody: this.state.newPostBody,
+      postAuthor: this.state.newPostAuthor
+    };
+    await axios.post(apiEndpoint, post).then(() => {
+      this.handleGetAll();
+      this.toggleAddPostForm();
+    });
+    
   };
 
-  handleUpdate = async post => {
-    //we choose to update the title of a post
-    post.title = "UPDATED";
-    //we use the put method of axios, we specify the endpoint and we must specify the id so he knows what post to update, then we pass the object
-    await axios.put(apiEndpoint + "/" + post.id, post)
-    //after that, we must update the state, so we copy in a new array , the array of posts
-    //we search for the index of the post we updated
-    //then we pass that index to the array and add the post that was updated, then update the state
-    const posts = [...this.state.posts];
-    const index = posts.indexOf(post);
-    posts[index] = {...post}
-    this.setState({posts})
+  toggleUpdatePostVisible = (e) => {
+    this.setState({ updatePostVisible: !this.state.updatePostVisible });
+    if (!this.state.updatePostVisible) {
+      var currentPost = this.state.posts.filter((post) => {
+        return post.id !== e.currentTarget.dataset.id;
+      });
+      console.log(currentPost)
+      this.setState({ updatedPostTitle: currentPost[0].postTitle });
+      this.setState({ updatedPostBody: currentPost[0].postBody });
+    }
+  }
+
+  handleUpdate = async e => {
+
+
+    var putPost = {
+      _id: e.currentTarget.dataset.id,
+      post: {
+        postTitle: this.state.updatedPostTitle,
+        postBody: this.state.updatedPostBody
+      }
+    }
+
+   
+    await axios.put(apiEndpoint, putPost).then((data) => {
+      this.handleGetAll();
+      this.setState({ updatePostVisible: !this.state.updatePostVisible });
+    });
+    
 
   };
 
@@ -63,16 +102,16 @@ class App extends Component {
     //when an error accured, example the delete fails, we must revert the UI to the previous state
     // by creating a costant with the previous state before the call to the server for deleting
     //N.B this implementation is  called optmistic update
-    const originalPosts = this.state.posts;
     //we call the delete method, pass the endpoint and the id of the post we want to delete
     //we create a posts constant and we pass the array of posts in the state then we use the filter method to compare the id of the post 
     //we re deleting and the id of the post in the array
     //so we want all posts except that we are deleting
-    const posts = this.state.posts.filter(p => p.id !== post.id);
-    this.setState({ posts });
+    
     //we surround the call the to the serve with a try catch, if the call fails, we show an error message and then return to the previous state
     try {
-      await axios.delete(apiEndpoint + '/999' + post.id);
+      await axios.delete(`${apiEndpoint}/${post._id}`).then((data) => {
+        this.handleGetAll();
+      });
       
     }
     catch (ex) {
@@ -94,7 +133,6 @@ class App extends Component {
         alert('An unexpected error occured.')
       }
      
-      this.setState({posts:originalPosts})
     }
    
   };
@@ -102,28 +140,87 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <button className="btn btn-primary" onClick={this.handleAdd}>
-          Add
+        <button className="btn btn-primary m-2" onClick={this.toggleAddPostForm}>
+          Add post
         </button>
+        {this.state.addFormVisible && (
+          <div>
+            <br />
+            <input className="form-control" type="text" placeholder="Post id" id="post-id" value={this.state.newPostId} onChange={(e) => {this.setState({newPostId: e.currentTarget.value})}}/>
+            <br />
+            <input className="form-control" type="text" placeholder="Post title" id="post-title" value={this.state.newPostTitle} onChange={(e) => {this.setState({newPostTitle: e.currentTarget.value})}} />
+            <br />
+            <textarea className="form-control" placeholder="Post body" id="post-body" rows="5" value={this.state.newPostBody} onChange={(e) => {this.setState({newPostBody: e.currentTarget.value})}}/>
+            <br />
+            <input className="form-control" type="text" placeholder="Post Author" id="post-author" value={this.state.newPostAuthor} onChange={(e) => {this.setState({newPostAuthor: e.currentTarget.value})}}/>
+            <br />
+            <button className="btn btn-success m-2" onClick={this.toggleAddPostForm}>
+              Cancel
+            </button>
+            <button className="btn btn-success" onClick={this.handleAdd}>
+              Confirm
+            </button>
+            <br />
+          </div>
+        )}
         <table className="table">
           <thead>
             <tr>
               <th>Title</th>
+              <th>Body</th>
               <th>Update</th>
               <th>Delete</th>
             </tr>
           </thead>
           <tbody>
             {this.state.posts.map(post => (
-              <tr key={post.id}>
-                <td>{post.title}</td>
+              <tr key={post._id}>
                 <td>
-                  <button
-                    className="btn btn-info btn-sm"
-                    onClick={() => this.handleUpdate(post)}
-                  >
-                    Update
-                  </button>
+                  {!this.state.updatePostVisible && (
+                    post.postTitle
+                  )}
+                  {this.state.updatePostVisible && (
+                    <input className="form-control" value={this.state.updatedPostTitle}  onChange={(e) => {this.setState({updatedPostTitle: e.currentTarget.value})}}/>
+                  )}
+                  
+                </td>
+                <td>
+                  
+                  {!this.state.updatePostVisible && (
+                    post.postBody
+                  )}
+                  {this.state.updatePostVisible && (
+                    <textarea rows="5" className="form-control" value={this.state.updatedPostBody}  onChange={(e) => {this.setState({updatedPostBody: e.currentTarget.value})}}/> 
+                  )}
+                </td>
+                <td>
+                   {!this.state.updatePostVisible && (
+                    <button
+                      className="btn btn-info btn-sm"
+                      onClick={(e) => this.toggleUpdatePostVisible(e)}
+                      data-id={post._id}
+                    >
+                      Update
+                    </button>
+                  )}
+                  
+                  {this.state.updatePostVisible && (
+                    <div>
+                       <button
+                      className="btn btn-info btn-sm m-2"
+                      onClick={(e) => this.handleUpdate(e)}
+                      data-id={post._id}
+                    >
+                      Save
+                    </button>
+                     <button
+                     className="btn btn-info btn-sm"
+                     onClick={() => this.toggleUpdatePostVisible()}
+                   >
+                   Cancel
+                 </button>
+                   </div>
+                  )}
                 </td>
                 <td>
                   <button
